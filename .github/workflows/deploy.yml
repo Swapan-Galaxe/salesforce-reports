@@ -1,0 +1,44 @@
+name: Salesforce CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Salesforce CLI
+        run: npm install -g sfdx-cli
+      
+      - name: Authenticate to Salesforce
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > auth.txt
+          sfdx force:auth:sfdxurl:store -f auth.txt -a cicd
+          rm auth.txt
+      
+      - name: Validate Deployment
+        run: sfdx force:source:deploy -p force-app -u cicd --checkonly --testlevel RunLocalTests
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Salesforce CLI
+        run: npm install -g sfdx-cli
+      
+      - name: Authenticate to Salesforce
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > auth.txt
+          sfdx force:auth:sfdxurl:store -f auth.txt -a cicd
+          rm auth.txt
+      
+      - name: Deploy to Salesforce
+        run: sfdx force:source:deploy -p force-app -u cicd --testlevel RunLocalTests
