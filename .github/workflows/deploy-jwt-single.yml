@@ -1,4 +1,4 @@
-name: Salesforce CI/CD
+name: Salesforce CI/CD JWT Single Org
 
 on:
   push:
@@ -18,9 +18,9 @@ jobs:
       
       - name: Authenticate to Salesforce
         run: |
-          echo "${{ secrets.SFDX_AUTH_URL_PROD }}" > auth.txt
-          sf org login sfdx-url --sfdx-url-file auth.txt --alias cicd
-          rm auth.txt
+          echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd
+          rm server.key
       
       - name: Validate Deployment
         run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --test-level RunLocalTests
@@ -36,9 +36,9 @@ jobs:
       
       - name: Authenticate to Salesforce
         run: |
-          echo "${{ secrets.SFDX_AUTH_URL }}" > auth.txt
-          sf org login sfdx-url --sfdx-url-file auth.txt --alias cicd
-          rm auth.txt
+          echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd
+          rm server.key
       
       - name: Deploy to Salesforce
         run: sf project deploy start --source-dir force-app --target-org cicd --test-level RunLocalTests
