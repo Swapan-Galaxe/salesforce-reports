@@ -14,16 +14,16 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Install Salesforce CLI
-        run: npm install -g sfdx-cli
+        run: npm install -g @salesforce/cli
       
       - name: Authenticate to Salesforce
         run: |
           echo "${{ secrets.SFDX_AUTH_URL }}" > auth.txt
-          sfdx force:auth:sfdxurl:store -f auth.txt -a cicd
+          sf org login sfdx-url --sfdx-url-file auth.txt --alias cicd
           rm auth.txt
       
       - name: Validate Deployment
-        run: sfdx force:source:deploy -p force-app -u cicd --checkonly --testlevel RunLocalTests
+        run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --test-level RunLocalTests
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -32,13 +32,13 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Install Salesforce CLI
-        run: npm install -g sfdx-cli
+        run: npm install -g @salesforce/cli
       
       - name: Authenticate to Salesforce
         run: |
           echo "${{ secrets.SFDX_AUTH_URL }}" > auth.txt
-          sfdx force:auth:sfdxurl:store -f auth.txt -a cicd
+          sf org login sfdx-url --sfdx-url-file auth.txt --alias cicd
           rm auth.txt
       
       - name: Deploy to Salesforce
-        run: sfdx force:source:deploy -p force-app -u cicd --testlevel RunLocalTests
+        run: sf project deploy start --source-dir force-app --target-org cicd --test-level RunLocalTests
