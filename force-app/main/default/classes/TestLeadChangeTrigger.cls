@@ -9,7 +9,7 @@ private class TestLeadChangeTrigger {
         Insert new Lead(FirstName = 'Test',
                         LastName = 'Lead33',
                         Company = 'Salesforce',
-                        region__c = 'Noida');
+                        region__c = 'New Delhi');
         //Call deliver to fire the trigger and deliver the test change event.
         Test.getEventBus().deliver();
          
