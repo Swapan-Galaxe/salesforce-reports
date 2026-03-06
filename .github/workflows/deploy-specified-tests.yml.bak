@@ -1,19 +1,16 @@
-name: Salesforce CI/CD JWT Single Org
+name: Deploy with Specified Tests
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'force-app/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'force-app/**'
 
 jobs:
   validate:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
       
@@ -23,15 +20,16 @@ jobs:
       - name: Authenticate to Salesforce
         run: |
           echo "${{ secrets.SF_SERVER_KEY }}" > server.key
-          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd --set-default
           rm server.key
       
       - name: Validate Deployment
-        run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --test-level NoTestRun
+        run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --tests AnalyticsQueryBuilderTest
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
       
@@ -41,18 +39,11 @@ jobs:
       - name: Authenticate to Salesforce
         run: |
           echo "${{ secrets.SF_SERVER_KEY }}" > server.key
-          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME }} --instance-url ${{ secrets.SF_INSTANCE_URL }} --alias cicd --set-default
           rm server.key
       
       - name: Deploy to Salesforce
-<<<<<<< Updated upstream
-        run: sf project deploy start --source-dir force-app --target-org cicd --test-level RunLocalTests
-=======
-        run: sf project deploy start --source-dir force-app --target-org cicd --test-level NoTestRun
-      
-      - name: Run Python Tests
-        run: |
-          python test_salesforce.py
+        run: sf project deploy start --source-dir force-app --target-org cicd --tests AnalyticsQueryBuilderTest
       
       - name: Deployment Status
         if: always()
@@ -62,4 +53,3 @@ jobs:
           else
             echo "❌ Deployment failed"
           fi
->>>>>>> Stashed changes

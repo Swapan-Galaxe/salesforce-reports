@@ -1,0 +1,55 @@
+name: Dev to QA Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-qa:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+      
+      - name: Authenticate to QA Org
+        run: |
+          echo "${{ secrets.SF_SERVER_KEY_QA }}" > server.key
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY_QA }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME_QA }} --instance-url ${{ secrets.SF_INSTANCE_URL_QA }} --alias qa --set-default
+          rm server.key
+      
+      - name: Validate Deployment to QA
+        run: sf project deploy start --source-dir force-app --target-org qa --dry-run --test-level RunLocalTests
+
+  deploy-qa:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+      
+      - name: Authenticate to QA Org
+        run: |
+          echo "${{ secrets.SF_SERVER_KEY_QA }}" > server.key
+          sf org login jwt --client-id ${{ secrets.SF_CONSUMER_KEY_QA }} --jwt-key-file server.key --username ${{ secrets.SF_USERNAME_QA }} --instance-url ${{ secrets.SF_INSTANCE_URL_QA }} --alias qa --set-default
+          rm server.key
+      
+      - name: Deploy to QA
+        run: sf project deploy start --source-dir force-app --target-org qa --test-level RunLocalTests
+      
+      - name: Deployment Status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ QA Deployment successful"
+          else
+            echo "❌ QA Deployment failed"
+          fi

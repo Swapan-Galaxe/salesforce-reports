@@ -1,3 +1,15 @@
 {
-    "xml.preferences.showSchemaDocumentationType": "none"
+  "salesforcedx-vscode-apex.enable-sobject-refresh-on-startup": true,
+  "salesforcedx-vscode-apex.java.home": "",
+  
+  "apex-pmd.rulesets": [
+    "${workspaceRoot}/.amazonq/pmd-ruleset.xml"
+  ],
+  "apex-pmd.runOnFileOpen": true,
+  "apex-pmd.runOnFileSave": true,
+  "apex-pmd.priorityErrorThreshold": 1,
+  "apex-pmd.priorityWarnThreshold": 3,
+  "apex-pmd.showErrors": true,
+  "apex-pmd.showStdOut": false,
+  "apex-pmd.showStdErr": true
 }
