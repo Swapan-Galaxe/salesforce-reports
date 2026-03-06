@@ -1,0 +1,12 @@
+# Salesforce
+.sfdx/
+.sf/
+.localdevserver/
+
+# Exclude files outside force-app
+/*.apex
+/*.py
+/*.txt
+/standards/
+/.sfdx/orgs/
+.github/workflows/*.bak

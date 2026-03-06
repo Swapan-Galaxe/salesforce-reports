@@ -19,6 +19,7 @@ public with sharing class ContactController {
             ];
         }
 
+        // Method to fetch the latest ContentVersion Id for a given ContentDocumentId
     @AuraEnabled(cacheable=true)
     public static string getContentVersion(Id docId){
         return [
@@ -29,7 +30,6 @@ public with sharing class ContactController {
         ].Id;
     }
 
-    // Method to fetch Contact records based on AccountId
     @AuraEnabled( cacheable = true )
     public static List<Contact> fetchContacts(String recordId) {
         return [SELECT Id, AccountId, FirstName, LastName, Email FROM Contact WHERE AccountId =:recordId LIMIT 100];

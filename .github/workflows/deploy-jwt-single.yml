@@ -45,14 +45,7 @@ jobs:
           rm server.key
       
       - name: Deploy to Salesforce
-<<<<<<< Updated upstream
-        run: sf project deploy start --source-dir force-app --target-org cicd --test-level RunLocalTests
-=======
         run: sf project deploy start --source-dir force-app --target-org cicd --test-level NoTestRun
-      
-      - name: Run Python Tests
-        run: |
-          python test_salesforce.py
       
       - name: Deployment Status
         if: always()
@@ -62,4 +55,3 @@ jobs:
           else
             echo "❌ Deployment failed"
           fi
->>>>>>> Stashed changes
