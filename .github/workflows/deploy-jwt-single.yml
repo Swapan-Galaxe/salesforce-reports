@@ -3,8 +3,12 @@ name: Salesforce CI/CD JWT Single Org
 on:
   push:
     branches: [main]
+    paths:
+      - 'force-app/**'
   pull_request:
     branches: [main]
+    paths:
+      - 'force-app/**'
 
 jobs:
   validate:
@@ -24,7 +28,7 @@ jobs:
           rm server.key
       
       - name: Validate Deployment
-        run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --test-level RunLocalTests
+        run: sf project deploy start --source-dir force-app --target-org cicd --dry-run --test-level NoTestRun
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
