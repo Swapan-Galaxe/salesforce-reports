@@ -19,7 +19,7 @@ public with sharing class ContactController {
             ];
         }
 
-        // Method to fetch the latest ContentVersion Id for a given ContentDocumentId
+        //
     @AuraEnabled(cacheable=true)
     public static string getContentVersion(Id docId){
         return [
